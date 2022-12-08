@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
 const HeaderStyles = styled.header`
-  padding: 40px 0;
+  padding: 20px 0;
   .header-main {
     display: flex;
     align-items: center;
@@ -40,17 +40,23 @@ const HeaderStyles = styled.header`
     flex: 1;
     padding-right: 40px;
   }
-
   .search-icon {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     right: 25px;
   }
-
-  /* .Header-button {
-    margin-left: 20px;
-  } */
+  @media screen and (max-width: 1024px) {
+    .logo {
+      max-width: 30px;
+    }
+    .menu,
+    .search,
+    .header-button,
+    .header-auth {
+      display: none;
+    }
+  }
 `;
 
 const MenuLinks = [
