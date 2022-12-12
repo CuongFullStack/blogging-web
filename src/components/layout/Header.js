@@ -145,9 +145,9 @@ const Header = () => {
               type="button"
               height="56px"
               className="Header-button"
-              to="/sign-up"
+              to="/sign-in"
             >
-              Sign Up
+              Login
             </Button>
           ) : (
             <div className="header-auth">

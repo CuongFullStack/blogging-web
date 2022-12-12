@@ -1,20 +1,7 @@
+@import "reset";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-* {
-  margin: 0;
-  padding: 0;
-}
-
-html,
-body {
-  height: 100%;
-}
 
 @layer base {
   body {
@@ -25,32 +12,6 @@ body {
     font-size: 16px;
     color: #232323;
   }
-}
-
-img,
-picture,
-video,
-canvas,
-svg {
-  display: block;
-  max-width: 100%;
-}
-input,
-button,
-textarea,
-select {
-  font: inherit;
-  outline: none;
-  border: none;
-}
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  overflow-wrap: break-word;
 }
 
 .container {
@@ -151,4 +112,16 @@ a {
       font-size: 20px;
     }
   }
+}
+
+.hidden-input {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap;
 }
