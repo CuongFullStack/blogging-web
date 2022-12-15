@@ -59,7 +59,9 @@ const SignUpPage = () => {
     navigate("/");
   };
 
-  // console.log(errors);
+  console.log(errors);
+  console.log(Object.values(errors));
+
   useEffect(() => {
     const arrErroes = Object.values(errors);
     if (arrErroes.length > 0) {
