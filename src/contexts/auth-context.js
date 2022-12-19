@@ -17,6 +17,8 @@
 import { auth } from "firebase-app/firebase-config";
 import { onAuthStateChanged } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
+// const { createContext, useContext, useState, useEffect } = require("react");
+// import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
 function AuthProvider(props) {

@@ -4,11 +4,35 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
+const MenuLinks = [
+  {
+    url: "/",
+    title: "Home",
+  },
+  {
+    url: "/blog",
+    title: "Blog",
+  },
+  {
+    url: "/contact",
+    title: "Contact",
+  },
+  // {
+  //     url: '/#',
+  //     title: 'Home',
+  // },
+];
+
 const HeaderStyles = styled.header`
   padding: 20px 0;
   .header-main {
     display: flex;
     align-items: center;
+  }
+  .header-auth {
+    display: flex;
+    align-items: center;
+    gap: 20px;
   }
   .logo {
     display: block;
@@ -59,30 +83,11 @@ const HeaderStyles = styled.header`
   }
 `;
 
-const MenuLinks = [
-  {
-    url: "/",
-    title: "Home",
-  },
-  {
-    url: "/blog",
-    title: "Blog",
-  },
-  {
-    url: "/contact",
-    title: "Contact",
-  },
-  // {
-  //     url: '/#',
-  //     title: 'Home',
-  // },
-];
-
-function getLastName(name) {
-  if (!name) return "User";
-  const length = name.split(" ").length;
-  return name.split(" ")[length - 1];
-}
+// function getLastName(name) {
+//   if (!name) return "User";
+//   const length = name.split(" ").length;
+//   return name.split(" ")[length - 1];
+// }
 
 const Header = () => {
   const { userInfo } = useAuth();
@@ -151,10 +156,14 @@ const Header = () => {
             </Button>
           ) : (
             <div className="header-auth">
-              <span>Welcome back, </span>
-              <strong className="text-primary">
-                {getLastName(userInfo?.displayName)}
-              </strong>
+              <Button
+                type="button"
+                height="56px"
+                className="header-button"
+                to="/dashboard"
+              >
+                Dashboard
+              </Button>
             </div>
           )}
         </div>

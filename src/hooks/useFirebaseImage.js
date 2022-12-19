@@ -59,25 +59,31 @@ export default function useFirebaseImage(setValue, getValues) {
     handleUploadImage(file);
   };
 
+  const handleResetUpload = () => {
+    setImage("");
+    setProgress(0);
+  };
+
   const handleDeleteImage = () => {
     const storage = getStorage();
     const desertRef = ref(storage, "images/" + getValues("image_name"));
     deleteObject(desertRef)
       .then(() => {
         console.log("Remove image successfully");
-        setImage("");
-        setProgress(0);
+        // setImage("");
+        // setProgress(0);
+        handleResetUpload();
       })
       .catch((error) => {
         console.log(error);
         console.log("Can not delete image");
       });
   };
+
   return {
+    handleResetUpload,
     image,
-    setImage,
     progress,
-    setProgress,
     handleUploadImage,
     handleSelectImage,
     handleDeleteImage,
