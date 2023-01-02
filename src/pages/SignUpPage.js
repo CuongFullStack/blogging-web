@@ -10,10 +10,11 @@ import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "firebase-app/firebase-config";
 import { NavLink, useNavigate } from "react-router-dom";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
 import InputPasswordToggle from "components/input/InputPasswordToggle";
 import slugify from "slugify";
+import { userRole, userStatus } from "utils/constants";
 
 const schema = yup.object({
   fullname: yup.string().required("Please enter your fullname"),
@@ -36,19 +37,18 @@ const SignUpPage = () => {
     control,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
-    // watch,
-    // reset,
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
+
   const handleSignUp = async (values) => {
     if (!isValid) return;
-    // console.log(values);
-    // const user =
     await createUserWithEmailAndPassword(auth, values.email, values.password);
     await updateProfile(auth.currentUser, {
       displayName: values.fullname,
+      photoURL:
+        "https://firebasestorage.googleapis.com/v0/b/monkey-blogging-3a153.appspot.com/o/images%2F1946429.png?alt=media&token=5971d231-4854-4a94-8864-881dba5a2ffd",
     });
 
     //Dùng setDoc để đặt userId trùng với id phần lưu trữ
@@ -57,14 +57,13 @@ const SignUpPage = () => {
       email: values.email,
       password: values.password,
       username: slugify(values.fullname, { lower: true }),
+      avatar:
+        "https://firebasestorage.googleapis.com/v0/b/monkey-blogging-3a153.appspot.com/o/images%2F1946429.png?alt=media&token=5971d231-4854-4a94-8864-881dba5a2ffd",
+      status: userStatus.ACTIVE,
+      role: userRole.USER,
+      createdAt: serverTimestamp(),
     });
 
-    // const colRef = collection(db, "users");
-    // await addDoc(colRef, {
-    //   fullname: values.fullname,
-    //   email: values.email,
-    //   password: values.password,
-    // });
     toast.success("Sign up successfully!!!");
     navigate("/");
   };

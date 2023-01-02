@@ -23,9 +23,10 @@
 
 - id
 - displayName
+- username
 - email
 - password
-- avatar
+- avatar: url, image_name
 - status: 1(active) 2(pending) 3(ban)
 - role: 1(Admin) 2(Mod) 3(User)
 - permissions: "ADD_POST"

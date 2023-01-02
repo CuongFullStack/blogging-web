@@ -10,21 +10,38 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
+  getDocs,
+  limit,
   onSnapshot,
+  query,
+  startAfter,
+  where,
 } from "firebase/firestore";
 import { db } from "firebase-app/firebase-config";
 import { categoryStatus } from "utils/constants";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { debounce } from "lodash";
+
+const CATEGORY_PER_PAGE = 10;
 
 const CategoryManage = () => {
   const [categoryList, setCategoryList] = useState([]);
   const navigate = useNavigate();
+  const [filter, setFilter] = useState("");
+  const [lastDoc, setLastDoc] = useState();
+  const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    const colRef = collection(db, "categories");
-    onSnapshot(colRef, (snapshot) => {
+  //loadmore
+  const handleLoadMoreCategory = async () => {
+    // Construct a new query starting at this document,
+    const nextRef = query(
+      collection(db, "categories"),
+      startAfter(lastDoc || 0),
+      limit(CATEGORY_PER_PAGE)
+    );
+    setLastDoc(nextRef);
+    onSnapshot(nextRef, (snapshot) => {
       let results = [];
       snapshot.forEach((doc) => {
         results.push({
@@ -32,10 +49,52 @@ const CategoryManage = () => {
           ...doc.data(),
         });
       });
-      setCategoryList(results);
+      setCategoryList([...categoryList, ...results]);
     });
-  }, []);
-  console.log(categoryList);
+    const documentSnapshots = await getDocs(nextRef);
+    // Get the last visible document
+    const lastVisible =
+      documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    setLastDoc(lastVisible);
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      const colRef = collection(db, "categories");
+      //Tìm kiếm
+      const newRef = filter
+        ? query(
+            colRef,
+            where("name", ">=", filter),
+            where("name", "<=", filter + "utf8")
+          )
+        : query(colRef, limit(CATEGORY_PER_PAGE));
+
+      const documentSnapshots = await getDocs(newRef);
+
+      // Get the last visible document
+      const lastVisible =
+        documentSnapshots.docs[documentSnapshots.docs.length - 1];
+      setLastDoc(lastVisible);
+
+      onSnapshot(colRef, (snapshot) => {
+        setTotal(snapshot.size);
+      });
+
+      onSnapshot(newRef, (snapshot) => {
+        let results = [];
+        snapshot.forEach((doc) => {
+          results.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+        setCategoryList(results);
+      });
+    }
+    fetchData();
+  }, [filter]);
+  // console.log(categoryList);
 
   //Dùng thư viện sweetalert2 tạo thông báo trước khi xóa
   const handleDeleteCategory = async (docId) => {
@@ -56,6 +115,10 @@ const CategoryManage = () => {
     });
   };
 
+  const handleInputFilter = debounce((e) => {
+    setFilter(e.target.value);
+  }, 500);
+
   return (
     <div>
       <DashboardHeading title="Categories" desc="Manage your category">
@@ -63,6 +126,14 @@ const CategoryManage = () => {
           Create category
         </Button>
       </DashboardHeading>
+      <div className="mb-10 flex justify-end">
+        <input
+          type="text"
+          placeholder="Search category ..."
+          className="py-4 px-5 border border-gray-300 rounded-lg outline-none"
+          onChange={handleInputFilter}
+        />
+      </div>
       <Table>
         <thead>
           <tr>
@@ -107,6 +178,14 @@ const CategoryManage = () => {
             ))}
         </tbody>
       </Table>
+      {total > categoryList.length && (
+        <div className="mt-10">
+          <Button onClick={handleLoadMoreCategory} className="mx-auto">
+            Load more
+          </Button>
+          {/* {total} */}
+        </div>
+      )}
     </div>
   );
 };

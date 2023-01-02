@@ -4,96 +4,89 @@ import { Field, FieldCheckboxes } from "components/field";
 import ImageUpload from "components/image/ImageUpload";
 import { Input } from "components/input";
 import { Label } from "components/label";
-import { auth, db } from "firebase-app/firebase-config";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "firebase-app/firebase-config";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import useFirebaseImage from "hooks/useFirebaseImage";
 import DashboardHeading from "module/dashboard/DashboardHeading";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import slugify from "slugify";
 import { userRole, userStatus } from "utils/constants";
 
-const UserAddNew = () => {
+const UserUpdate = () => {
   const {
     control,
     handleSubmit,
-    setValue,
+    formState: { isSubmitting, isValid },
     watch,
-    getValues,
-    formState: { isValid, isSubmitting },
     reset,
+    getValues,
+    setValue,
   } = useForm({
     mode: "onChange",
-    defaultValues: {
-      fullname: "",
-      email: "",
-      password: "",
-      username: "",
-      avatar: "",
-      status: userStatus.ACTIVE,
-      role: userRole.USER,
-      createdAt: new Date(),
-    },
   });
 
+  const [params] = useSearchParams();
+  const userId = params.get("id");
+  const watchStatus = watch("status");
+  const watchRole = watch("role");
+  const imageUrl = getValues("avatar");
+  const imageRegex = /%2F(\S+)\?/gm.exec(imageUrl);
+  const image_name = imageRegex?.length > 0 ? imageRegex[1] : "";
   const {
     handleResetUpload,
     image,
+    setImage,
     progress,
     handleSelectImage,
     handleDeleteImage,
-  } = useFirebaseImage(setValue, getValues);
+  } = useFirebaseImage(setValue, getValues, image_name, deleteAvatar);
 
-  const handleCreateUser = async (values) => {
+  const handleUpdateUser = async (values) => {
     if (!isValid) return;
     try {
-      await createUserWithEmailAndPassword(auth, values.email, values.password);
-      await addDoc(collection(db, "users"), {
-        fullname: values.fullname,
-        email: values.email,
-        password: values.password,
-        username: slugify(values.username || values.fullname, {
-          lower: true,
-          replacement: " ",
-          trim: true,
-        }),
+      const colRef = doc(db, "users", userId);
+      await updateDoc(colRef, {
+        ...values,
         avatar: image,
-        status: Number(values.status),
-        role: Number(values.role),
-        createdAt: serverTimestamp(),
       });
-      toast.success(
-        `Create new user with email: ${values.email} successfully!`
-      );
-      reset({
-        fullname: "",
-        email: "",
-        password: "",
-        username: "",
-        avatar: "",
-        status: userStatus.ACTIVE,
-        role: userRole.USER,
-        createdAt: new Date(),
-      });
-      handleResetUpload();
-    } catch (error) {
-      console.log(error);
-      toast.error("Can not create new user");
+      toast.success("Update user information successfully!");
+    } catch (err) {
+      console.log(err);
+      toast.error("Update user failed!");
     }
   };
 
-  const watchStatus = watch("status");
-  const watchRole = watch("role");
+  async function deleteAvatar() {
+    const colRef = doc(db, "users", userId);
+    await updateDoc(colRef, {
+      avatar: "",
+    });
+  }
 
+  useEffect(() => {
+    setImage(imageUrl);
+  }, [imageUrl, setImage]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const colRef = doc(db, "users", userId);
+      const docData = await getDoc(colRef);
+      //   console.log(docData.data());
+      reset(docData && docData.data());
+    }
+    fetchData();
+  }, [userId]);
+
+  if (!userId) return null;
   return (
     <div>
       <DashboardHeading
-        title="New user"
-        desc="Add new user to system"
+        title="Update user"
+        desc="Update user information"
       ></DashboardHeading>
-      <form onSubmit={handleSubmit(handleCreateUser)}>
+      <form onSubmit={handleSubmit(handleUpdateUser)}>
         <div className="w-[200px] h-[200px] rounded-full mx-auto">
           <ImageUpload
             className="!rounded-full h-full"
@@ -208,11 +201,11 @@ const UserAddNew = () => {
           isLoading={isSubmitting}
           disabled={isSubmitting}
         >
-          Add new user
+          Update
         </Button>
       </form>
     </div>
   );
 };
 
-export default UserAddNew;
+export default UserUpdate;

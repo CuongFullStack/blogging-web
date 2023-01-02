@@ -17,6 +17,7 @@ import SignUpPage from "pages/SignUpPage";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth-context";
+import UserUpdate from "module/user/UserUpdate";
 // import SignUpPage from "pages/SignUpPage";
 
 const App = () => {
@@ -64,6 +65,10 @@ const App = () => {
             <Route
               path="/manage/add-user"
               element={<UserAddNew></UserAddNew>}
+            ></Route>
+            <Route
+              path="/manage/update-user"
+              element={<UserUpdate></UserUpdate>}
             ></Route>
             <Route
               path="/profile"
