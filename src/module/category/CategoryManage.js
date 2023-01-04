@@ -75,7 +75,6 @@ const CategoryManage = () => {
       // Get the last visible document
       const lastVisible =
         documentSnapshots.docs[documentSnapshots.docs.length - 1];
-      setLastDoc(lastVisible);
 
       onSnapshot(colRef, (snapshot) => {
         setTotal(snapshot.size);
@@ -91,6 +90,7 @@ const CategoryManage = () => {
         });
         setCategoryList(results);
       });
+      setLastDoc(lastVisible);
     }
     fetchData();
   }, [filter]);

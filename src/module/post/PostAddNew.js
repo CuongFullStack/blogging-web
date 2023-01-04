@@ -14,6 +14,8 @@ import Toggle from "components/toggle/Toggle";
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -32,9 +34,10 @@ const PostAddNew = () => {
       title: "",
       slug: "",
       status: 2,
-      categoryId: "",
       hot: false,
       image: "",
+      category: {},
+      user: {},
     },
   });
 
@@ -53,8 +56,27 @@ const PostAddNew = () => {
   } = useFirebaseImage(setValue, getValues);
 
   const [categories, setCategories] = useState([]);
-  const [selectCategory, SetSelectCategory] = useState({});
+  const [selectCategory, setSelectCategory] = useState({});
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchUserData() {
+      if (!userInfo.email) return;
+      const q = query(
+        collection(db, "users"),
+        where("email", "==", userInfo.email)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        setValue("user", {
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+    }
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo.email]);
 
   const addPostHandler = async (values) => {
     setLoading(true);
@@ -66,7 +88,6 @@ const PostAddNew = () => {
       await addDoc(colRef, {
         ...cloneValues,
         image,
-        userId: userInfo.uid,
         createdAt: serverTimestamp(), //serverTimestamp là một function
       });
       toast.success("Create new post successfully!");
@@ -75,13 +96,14 @@ const PostAddNew = () => {
         title: "",
         slug: "",
         status: 2,
-        categoryId: "",
+        category: {},
         hot: false,
         image: "",
+        user: {},
       });
       //Xóa hiển thị ảnh
       handleResetUpload();
-      SetSelectCategory({});
+      setSelectCategory({});
     } catch (error) {
       setLoading(false);
     } finally {
@@ -97,7 +119,7 @@ const PostAddNew = () => {
       const querySnapshot = await getDocs(q);
       let result = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
+        // console.log(doc.id, " => ", doc.data());
         result.push({
           id: doc.id,
           ...doc.data(),
@@ -113,9 +135,14 @@ const PostAddNew = () => {
     document.title = "Monkey Blogging - Add new post";
   }, []);
 
-  const handleClickOption = (item) => {
-    setValue("categoryId", item.id);
-    SetSelectCategory(item);
+  const handleClickOption = async (item) => {
+    const colRef = doc(db, "categories", item.id);
+    const docData = await getDoc(colRef);
+    setValue("category", {
+      id: docData.id,
+      ...docData.data(),
+    });
+    setSelectCategory(item);
   };
 
   return (

@@ -18,6 +18,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth-context";
 import UserUpdate from "module/user/UserUpdate";
+import PostUpdate from "module/post/PostUpdate";
 // import SignUpPage from "pages/SignUpPage";
 
 const App = () => {
@@ -45,6 +46,10 @@ const App = () => {
             <Route
               path="/manage/add-post"
               element={<PostAddNew></PostAddNew>}
+            ></Route>
+            <Route
+              path="/manage/update-post"
+              element={<PostUpdate></PostUpdate>}
             ></Route>
             <Route
               path="/manage/category"
