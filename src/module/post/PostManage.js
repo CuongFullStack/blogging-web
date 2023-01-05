@@ -88,7 +88,7 @@ const PostManage = () => {
   }
 
   const renderPostStatus = (status) => {
-    switch (status) {
+    switch (Number(status)) {
       case postStatus.APPROVED:
         return <LabelStatus type="success">Approved</LabelStatus>;
       case postStatus.PENDING:
