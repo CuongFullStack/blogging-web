@@ -1,16 +1,16 @@
-import Heading from "components/layout/Heading";
 import Layout from "components/layout/Layout";
 import { db } from "firebase-app/firebase-config";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import PostCategory from "module/post/PostCategory";
 import PostImage from "module/post/PostImage";
-import PostItem from "module/post/PostItem";
 import PostMeta from "module/post/PostMeta";
 import PageNotFound from "pages/PageNotFound";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import parse from "html-react-parser";
+import AuthorBox from "components/author/AuthorBox";
+import PostRelated from "./PostRelated";
 
 const PostDetailsPageStyles = styled.div`
   padding-bottom: 100px;
@@ -114,11 +114,15 @@ const PostDetailsPage = () => {
     }
     fetchData();
   }, [slug]);
-  if (!slug || !postInfo.title) return <PageNotFound></PageNotFound>;
+
+  useEffect(() => {
+    document.body.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [slug]);
+
+  if (!slug) return <PageNotFound></PageNotFound>;
   if (!postInfo.title) return null;
 
   const { user } = postInfo;
-  console.log(user);
   return (
     <PostDetailsPageStyles>
       <Layout>
@@ -126,7 +130,7 @@ const PostDetailsPage = () => {
           <div className="post-header">
             <PostImage url={postInfo.image}></PostImage>
             <div className="post-info">
-              <PostCategory className="mb-6">
+              <PostCategory className="mb-6" to={postInfo.category?.slug}>
                 {postInfo.category?.name}
               </PostCategory>
               <h1 className="post-heading">{postInfo.title}</h1>
@@ -135,25 +139,10 @@ const PostDetailsPage = () => {
           </div>
           <div className="post-content">
             <div className="entry-content">{parse(postInfo.content || "")}</div>
-            <div className="author">
-              <div className="author-image">
-                <img src={user?.avatar} alt="" />
-              </div>
-              <div className="author-content">
-                <h3 className="author-name">{user?.fullname}</h3>
-                <p className="author-desc">{user?.description}</p>
-              </div>
-            </div>
+            <AuthorBox userId={user.id}></AuthorBox>
           </div>
-          <div className="post-related">
-            <Heading>Bài viết liên quan</Heading>
-            <div className="grid-layout grid-layout--primary">
-              <PostItem></PostItem>
-              <PostItem></PostItem>
-              <PostItem></PostItem>
-              <PostItem></PostItem>
-            </div>
-          </div>
+
+          <PostRelated categoryId={postInfo?.category?.id}></PostRelated>
         </div>
       </Layout>
     </PostDetailsPageStyles>

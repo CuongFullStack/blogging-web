@@ -3,6 +3,7 @@ import { Button } from "components/button";
 import { Dropdown } from "components/dropdown";
 import { LabelStatus } from "components/label";
 import { Table } from "components/table";
+import { useAuth } from "contexts/auth-context";
 import { db } from "firebase-app/firebase-config";
 import {
   collection,
@@ -20,7 +21,7 @@ import DashboardHeading from "module/dashboard/DashboardHeading";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { postStatus } from "utils/constants";
+import { postStatus, userRole } from "utils/constants";
 
 const POST_PER_PAGE = 10;
 
@@ -128,6 +129,10 @@ const PostManage = () => {
       documentSnapshots.docs[documentSnapshots.docs.length - 1];
     setLastDoc(lastVisible);
   };
+
+  //Phân quyền
+  // const { userInfo } = useAuth();
+  // if (userInfo.role !== userRole.ADMIN) return null;
 
   return (
     <div>

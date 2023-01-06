@@ -25,4 +25,11 @@
 22. Update auth information
 23. Optimize source code(PropTypes, logic, error boundary, routes, UI UX...)
 24. Congratulations 🎉
+
+Challenge
+- Update Profile,
+- Author Page
+- PropTypes
+- Error boundary
+- UI UX
 -->

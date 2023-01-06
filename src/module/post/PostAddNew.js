@@ -87,6 +87,7 @@ const PostAddNew = () => {
       const colRef = collection(db, "posts");
       await addDoc(colRef, {
         ...cloneValues,
+
         image,
         createdAt: serverTimestamp(), //serverTimestamp là một function
       });

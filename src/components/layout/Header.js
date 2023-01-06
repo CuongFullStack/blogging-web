@@ -28,6 +28,7 @@ const HeaderStyles = styled.header`
   .header-main {
     display: flex;
     align-items: center;
+    justify-content: space-between; //Thêm để bỏ search
   }
   .header-auth {
     display: flex;
@@ -108,7 +109,7 @@ const Header = () => {
               </li>
             ))}
           </ul>
-          <div className="search">
+          {/* <div className="search">
             <input
               type="text"
               className="search-input"
@@ -144,7 +145,7 @@ const Header = () => {
                 />
               </svg>
             </span>
-          </div>
+          </div> */}
           {!userInfo ? (
             <Button
               type="button"
